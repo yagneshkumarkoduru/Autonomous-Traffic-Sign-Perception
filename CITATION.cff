@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this software or research architecture in your work, please cite it as below."
+title: "Autonomous-Traffic-Sign-Perception: Neuromorphic Event-RGB Cross-Attention Fusion and Certified Spatial Transformer Networks"
+authors:
+  - family-names: "Koduru"
+    given-names: "Yagnesh Kumar"
+    affiliation: "Esthien Labs"
+    orcid: "https://orcid.org/0009-0000-0000-0000"
+date-released: 2026-09-04
+repository-code: "https://github.com/yagneshkumarkoduru/Autonomous-Traffic-Sign-Perception"
+license: "MIT"
+keywords:
+  - "event camera"
+  - "neuromorphic vision"
+  - "spatial transformer networks"
+  - "randomized smoothing"
+  - "autonomous vehicles"

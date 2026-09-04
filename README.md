@@ -2,12 +2,13 @@
 
 **Research Project | Autonomous Driving Vision, Neuromorphic Sensor Fusion & Certified Machine Learning**
 
+[![CI](https://github.com/yagneshkumarkoduru/Autonomous-Traffic-Sign-Perception/actions/workflows/ci.yml/badge.svg)](https://github.com/yagneshkumarkoduru/Autonomous-Traffic-Sign-Perception/actions)
 [![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Vision](https://img.shields.io/badge/vision-STN%20%7C%20Event--RGB%20Cross--Attention-brightgreen.svg)](docs/paper/RESEARCH_PAPER.md)
 [![Paper](https://img.shields.io/badge/paper-IEEE%20T--ITS%20Draft-purple.svg)](docs/paper/RESEARCH_PAPER.md)
 [![Robustness](https://img.shields.io/badge/robustness-Certified%20L2%20Radius%20(R%3D0.38)-orange.svg)](docs/STN_AFFINE_AND_NEURONAL_FUSION_THEORY.md)
 [![Hardware](https://img.shields.io/badge/hardware-TensorRT%20INT8%20%7C%20120%20FPS-red.svg)](docs/IMPLEMENTATION_VERSIONS.md)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 > 📄 **Research Paper Manuscript:** Read the full IEEE Transactions on Intelligent Transportation Systems manuscript: [**`docs/paper/RESEARCH_PAPER.md`**](docs/paper/RESEARCH_PAPER.md) | [LaTeX Source](docs/paper/Traffic_Perception_STN_Fusion_TITS.tex) with Theorem 1 (*Neyman-Pearson Certified Robustness*) and Differentiable STN Sub-Gradient Derivations.  
 > 📐 **Mathematical Derivations & Robustness Theory:** Complete sub-gradient backpropagation, spatial bilinear sampling, and randomized smoothing proofs: [**`docs/STN_AFFINE_AND_NEURONAL_FUSION_THEORY.md`**](docs/STN_AFFINE_AND_NEURONAL_FUSION_THEORY.md).  

@@ -2,11 +2,11 @@
 
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Dataset](https://img.shields.io/badge/Benchmark-GTSRB%2043--Class-orange.svg)](http://benchmark.ini.rub.de/?section=gtsrb&subsection=dataset)
+[![Benchmark](https://img.shields.io/badge/Benchmark-GTSRB%2043--Class-orange.svg)](http://benchmark.ini.rub.de/?section=gtsrb&subsection=dataset)
+[![Paper](https://img.shields.io/badge/paper-IEEE%20T--ITS%20Draft-purple.svg)](docs/paper/RESEARCH_PAPER.md)
 [![Accuracy](https://img.shields.io/badge/Test%20Accuracy-99.33%25-brightgreen.svg)](#2-quantitative-performance)
 
-**Author:** [Yagnesh Kumar Koduru](https://github.com/yagneshkumarkoduru)  
-**Domain:** Autonomous Driving Perception, Computer Vision, Multi-Scale Convolutional Networks  
+> 📄 **Research Paper Available:** Read the full IEEE Transactions on Intelligent Transportation Systems manuscript: [**`docs/paper/RESEARCH_PAPER.md`**](docs/paper/RESEARCH_PAPER.md) | [LaTeX Source](docs/paper/Traffic_Perception_STN_Fusion_TITS.tex) with Theorem 1 (*Certified $\ell_2$ Adversarial Sphere*) and Neuromorphic Event-RGB fusion derivations.
 
 ---
 

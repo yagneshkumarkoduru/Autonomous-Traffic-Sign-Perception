@@ -1,7 +1,7 @@
 # Spatial Transformer Affine Rectification, Event-RGB Fusion & Certified Robustness
 
 **Autonomous-Traffic-Sign-Perception: Vision Intelligence & Robust Perception Series**  
-*Esthien Labs Technical Report | Computer Vision & Neuromorphic Engineering*
+*Independent Research Technical Report | Computer Vision & Neuromorphic Engineering*
 
 ---
 

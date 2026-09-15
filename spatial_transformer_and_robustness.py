@@ -1,6 +1,6 @@
 """
 Differentiable Spatial Transformer Networks (STN) & Weather Robustness Benchmark
-Author: Yagnesh Kumar Koduru
+Author: Koduru Yagnesh Kumar
 Repository: Autonomous-Traffic-Sign-Perception
 Domain: Autonomous Driving Perception, Spatial Invariance, Robust Computer Vision
 """
@@ -107,7 +107,7 @@ class SpatialTransformerRobustnessEngine:
 def run_stn_robustness_study():
     print("=" * 80)
     print("SPATIAL TRANSFORMER NETWORK & ADVERSE WEATHER ROBUSTNESS BENCHMARK")
-    print("Author: Yagnesh Kumar Koduru")
+    print("Author: Koduru Yagnesh Kumar")
     print("=" * 80)
 
     engine = SpatialTransformerRobustnessEngine()

@@ -6,8 +6,8 @@ Neuromorphic Asynchronous Event-Camera + RGB Cross-Attention Fusion
 with Differentiable Spatial Transformer Networks (STN) and Certified
 Robustness Guarantees via Randomized Smoothing for Autonomous Vehicles.
 
-Author: Yagnesh Kumar Koduru
-Affiliation: Researcher | Esthien Labs
+Author: Koduru Yagnesh Kumar
+Affiliation: Independent Researcher
 """
 
 import os

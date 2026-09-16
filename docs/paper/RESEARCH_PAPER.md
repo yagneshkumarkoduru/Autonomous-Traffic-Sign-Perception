@@ -81,13 +81,11 @@ Benchmarking across high-speed velocity sweeps ($30\text{--}180\text{ km/h}$) an
 
 ## Citation
 ```bibtex
-@article{koduru2026traffic,
-  author    = {Koduru, Yagnesh Kumar},
-  title     = {Neuromorphic Event-RGB Cross-Attention Fusion with Differentiable Spatial Transformers and Certified Robustness for Autonomous Perception},
-  journal   = {IEEE Transactions on Intelligent Transportation Systems},
-  year      = {2026},
-  volume    = {27},
-  number    = {5},
-  pages     = {4820--4834}
+@misc{koduru2026traffic,
+  author = {Koduru, Yagnesh Kumar},
+  title  = {Neuromorphic Event-RGB Cross-Attention Fusion with Differentiable Spatial Transformers and Certified Robustness for Autonomous Perception},
+  year   = {2026},
+  note   = {Research manuscript draft; not peer reviewed},
+  url    = {https://github.com/yagneshkumarkoduru/Autonomous-Traffic-Sign-Perception}
 }
 ```

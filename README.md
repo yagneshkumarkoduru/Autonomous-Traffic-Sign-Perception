@@ -10,7 +10,7 @@
 [![Hardware](https://img.shields.io/badge/hardware-TensorRT%20INT8%20%7C%20120%20FPS-red.svg)](docs/IMPLEMENTATION_VERSIONS.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> 📄 **Research Paper Manuscript:** Read the full IEEE Transactions on Intelligent Transportation Systems manuscript: [**`docs/paper/RESEARCH_PAPER.md`**](docs/paper/RESEARCH_PAPER.md) | [LaTeX Source](docs/paper/Traffic_Perception_STN_Fusion_TITS.tex) with Theorem 1 (*Neyman-Pearson Certified Robustness*) and Differentiable STN Sub-Gradient Derivations.  
+> 📄 **Research Paper Manuscript:** Read the full research manuscript draft (target venue: IEEE Transactions on Intelligent Transportation Systems): [**`docs/paper/RESEARCH_PAPER.md`**](docs/paper/RESEARCH_PAPER.md) | [LaTeX Source](docs/paper/Traffic_Perception_STN_Fusion_TITS.tex) with Theorem 1 (*Neyman-Pearson Certified Robustness*) and Differentiable STN Sub-Gradient Derivations.  
 > 📐 **Mathematical Derivations & Robustness Theory:** Complete sub-gradient backpropagation, spatial bilinear sampling, and randomized smoothing proofs: [**`docs/STN_AFFINE_AND_NEURONAL_FUSION_THEORY.md`**](docs/STN_AFFINE_AND_NEURONAL_FUSION_THEORY.md).  
 > ⚙️ **Three Implementation Tiers:** Full architecture comparison and edge pipeline for V1, V2, and V3: [**`docs/IMPLEMENTATION_VERSIONS.md`**](docs/IMPLEMENTATION_VERSIONS.md).
 
@@ -112,13 +112,11 @@ python -m implementations.v3_event_rgb_certified_fusion.neyman_pearson_robustnes
 ## 5. Citation
 
 ```bibtex
-@article{koduru2026traffic,
-  author    = {Koduru, Yagnesh Kumar},
-  title     = {Neuromorphic Event-RGB Cross-Attention Fusion and Certified Spatial Transformers for High-Speed Autonomous Traffic Perception},
-  journal   = {IEEE Transactions on Intelligent Transportation Systems},
-  year      = {2026},
-  volume    = {27},
-  number    = {4},
-  pages     = {3120--3134}
+@misc{koduru2026traffic,
+  author = {Koduru, Yagnesh Kumar},
+  title  = {Neuromorphic Event-RGB Cross-Attention Fusion and Certified Spatial Transformers for High-Speed Autonomous Traffic Perception},
+  year   = {2026},
+  note   = {Research manuscript draft; not peer reviewed},
+  url    = {https://github.com/yagneshkumarkoduru/Autonomous-Traffic-Sign-Perception}
 }
 ```

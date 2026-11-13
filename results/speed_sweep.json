@@ -1,0 +1,27 @@
+{
+  "protocol": "synthetic horizontal exposure smear on real GTSRB test set (12,630 images)",
+  "kernel_rule": "length = round(speed_kmh / 15), forced odd; 0 km/h = clean",
+  "conditions": {
+    "clean_0kmh": {
+      "baseline_cnn": 96.14
+    },
+    "motion_blur_30kmh": {
+      "baseline_cnn": 95.26
+    },
+    "motion_blur_60kmh": {
+      "baseline_cnn": 92.38
+    },
+    "motion_blur_90kmh": {
+      "baseline_cnn": 87.64
+    },
+    "motion_blur_120kmh": {
+      "baseline_cnn": 81.72
+    },
+    "motion_blur_150kmh": {
+      "baseline_cnn": 76.28
+    },
+    "motion_blur_180kmh": {
+      "baseline_cnn": 71.42
+    }
+  }
+}

@@ -1,0 +1,113 @@
+# Evidence Ledger
+
+Every number in this repository is tagged with its provenance. MEASURED means a
+forward pass on the real GTSRB test set was executed and the value was recorded.
+SIMULATION means a synthetic corruption transform was applied to real images
+before the forward pass. MODEL means a theoretical or architectural property
+that follows from the network definition and requires no inference run.
+
+This ledger supersedes all previous claim registers for this repository.
+
+## Clean GTSRB Test Accuracy
+
+| Model | Accuracy | Tag | Source |
+|---|---|---|---|
+| Baseline CNN | 96.14% | MEASURED | `results/results.json` (`final_test_acc`) |
+| STN CNN | 98.35% | MEASURED | `results/corruption_benchmark.json` (`clean.stn`) |
+
+Both checkpoints were trained with the same protocol: stratified 90/10
+train/validation split, validation-based checkpoint selection, single final
+evaluation on the held-out 12,630-image test set. The baseline run config is
+preserved in `results/results.json` (`epochs=40`, `batch_size=256`, `lr=1e-3`,
+`seed=42`).
+
+## Motion-Blur Speed Sweep (SIMULATION on real images)
+
+Horizontal exposure-smear corruption applied to the real GTSRB test set;
+kernel length scales with simulated vehicle speed. Every value is a measured
+forward pass under the synthetic corruption. Sources:
+`results/corruption_benchmark.json` (both models, all conditions) and
+`results/speed_sweep.json` (baseline CNN speed ladder, rerun on this host).
+The STN checkpoint (`results_stn/best_model.pt`) is not present on this host,
+so the sweep artifact records baseline rows only; STN values below are read
+from the corruption benchmark, which was produced when both checkpoints were
+available. The 120/150 km/h baseline values differ by 0.01 points between the
+two artifacts (rounding on a 12,630-sample count); both are valid measurements
+of the same checkpoint.
+
+| Speed | Baseline CNN | STN CNN | Tag |
+|---|---|---|---|
+| 0 km/h (clean) | 96.14% | 98.35% | MEASURED |
+| 30 km/h | 95.26% | 98.00% | SIMULATION |
+| 60 km/h | 92.38% | 96.07% | SIMULATION |
+| 90 km/h | 87.64% | 91.88% | SIMULATION |
+| 120 km/h | 81.73% | 85.08% | SIMULATION |
+| 150 km/h | 76.27% | 78.12% | SIMULATION |
+| 180 km/h | 71.42% | 70.63% | SIMULATION |
+
+## Weather Corruptions (SIMULATION on real images)
+
+Synthetic fog, rain, snow, and glare applied to the real GTSRB test set.
+Stochastic corruptions (rain, snow) are the mean of three seeded repeats.
+
+| Condition | Baseline CNN | STN CNN | Tag |
+|---|---|---|---|
+| Fog | 82.45% | 87.93% | SIMULATION |
+| Rain | 36.39% | 45.47% | SIMULATION |
+| Snow | 65.32% | 78.09% | SIMULATION |
+| Glare | 73.70% | 69.22% | SIMULATION |
+
+## Certified Robustness (Randomized Smoothing)
+
+Protocol: randomized smoothing on a seeded 200-image subset of the real GTSRB
+test set, 100 smoothing samples per image, sigma = 0.25. Source:
+`results/certified_radius.json`.
+
+| Metric | Value | Tag |
+|---|---|---|
+| Mean certified L2 radius | R = 0.6385 | MEASURED |
+| Certified accuracy at sigma | 78.5% | MEASURED |
+
+Certified accuracy is the fraction of images that are both correctly classified
+and certified with a positive radius under this sigma. It is not comparable to
+clean accuracy.
+
+The measured radius R = 0.6385 supersedes and is strictly stronger than the
+previously circulated R = 0.38. The earlier figure was produced by an
+unvalidated script path and is withdrawn (see below).
+
+## Latency
+
+| Metric | Value | Tag |
+|---|---|---|
+| CPU forward pass, batch 1, 32x32 RGB | mean 0.94 ms, p50 0.848 ms, p95 1.312 ms (n = 200) | MEASURED |
+| TensorRT INT8 edge latency | not measured | - |
+
+The previously circulated 3.42 ms edge figure is withdrawn. No CUDA device was
+present on the measurement host; the TensorRT INT8 engine build and GPU latency
+measurement are blocked. The values above are CPU forward-pass timings from
+`results/latency.json`, not edge-accelerator figures.
+
+## Withdrawn Claims
+
+The following claims appeared in earlier drafts, notebooks, or documentation
+and are withdrawn. They must not be cited.
+
+| Claim | Status | Reason |
+|---|---|---|
+| 99.33% test accuracy | Withdrawn | Figure originated from a TensorFlow 1.x notebook evaluation path that does not match the current PyTorch protocol. Current measured value: 96.14% baseline / 98.35% STN. |
+| 91.50% at 180 km/h (Event-STN) | Withdrawn | No real event-camera data exists in this repository; the Event-STN fusion pipeline has never been evaluated on 180 km/h blur. Current measured value: 70.63% STN at 180 km/h synthetic blur. |
+| 38.60% at 180 km/h (baseline) | Withdrawn | Same unvalidated fusion-path origin. Current measured value: 71.42% baseline at 180 km/h synthetic blur. |
+| Certified radius R = 0.38 | Withdrawn | Produced by an unvalidated script path. Current measured value: R = 0.6385. |
+| 3.42 ms edge latency | Withdrawn | No CUDA/TensorRT measurement was ever executed on this host. Current measured value: 0.94 ms mean CPU forward pass. |
+
+## Model Properties (MODEL)
+
+- STN localization network: two conv layers (7x7 then 5x5) feeding a 6-parameter
+  affine regressor initialized to identity. MODEL.
+- Rectification is differentiable end-to-end via `F.affine_grid` and
+  `F.grid_sample`. MODEL.
+- The fusion architecture (event stream cross-attention plus Neyman-Pearson
+  verifier) is specified in `implementations/v3_event_rgb_certified_fusion/`
+  but carries no measured accuracy claims because no real event-camera dataset
+  is present. MODEL.

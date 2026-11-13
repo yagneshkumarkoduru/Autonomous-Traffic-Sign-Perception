@@ -6,8 +6,7 @@
 [![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Vision](https://img.shields.io/badge/vision-STN%20%7C%20Event--RGB%20Cross--Attention-brightgreen.svg)](docs/paper/RESEARCH_PAPER.md)
 [![Paper](https://img.shields.io/badge/paper-IEEE%20T--ITS%20Draft-purple.svg)](docs/paper/RESEARCH_PAPER.md)
-[![Robustness](https://img.shields.io/badge/robustness-Certified%20L2%20Radius%20(R%3D0.38)-orange.svg)](docs/STN_AFFINE_AND_NEURONAL_FUSION_THEORY.md)
-[![Hardware](https://img.shields.io/badge/hardware-TensorRT%20INT8%20%7C%20120%20FPS-red.svg)](docs/IMPLEMENTATION_VERSIONS.md)
+[![Robustness](https://img.shields.io/badge/robustness-Certified%20L2%20Radius%20R%3D0.64%20%28measured%29-orange.svg)](docs/STN_AFFINE_AND_NEURONAL_FUSION_THEORY.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 > 📄 **Research Paper Manuscript:** Read the full research manuscript draft (target venue: IEEE Transactions on Intelligent Transportation Systems): [**`docs/paper/RESEARCH_PAPER.md`**](docs/paper/RESEARCH_PAPER.md) | [LaTeX Source](docs/paper/Traffic_Perception_STN_Fusion_TITS.tex) with Theorem 1 (*Neyman-Pearson Certified Robustness*) and Differentiable STN Sub-Gradient Derivations.  
@@ -19,43 +18,81 @@
 ## 1. Executive Summary & Research Scope
 
 Autonomous vehicle perception in dynamic highway environments faces severe operational challenges:
-1. **High-Speed Motion Blur**: At highway velocities (up to $180\,\text{km/h}$), conventional frame-based CMOS cameras suffer from shutter integration blur ($\sim 33\,\text{ms}$), causing standard CNN classification accuracy to plummet from $97.8\%$ to $38.6\%$.
+1. **High-Speed Motion Blur**: At highway velocities (up to $180\,\text{km/h}$), conventional frame-based CMOS cameras suffer from shutter integration blur ($\sim 33\,\text{ms}$).
 2. **Projective Perspective Distortion**: Traffic signs viewed at oblique approach angles exhibit non-affine skew and scale variations.
-3. **Adversarial Vulnerability & Environmental Noise**: Small physical adversarial stickers or extreme weather (dense fog, snow, optical glare) easily fool standard feature extractors.
+3. **Environmental Corruption**: Fog, rain, snow, and sun glare degrade standard feature extractors.
 
-To solve these challenges, this project introduces:
+To address these challenges, this project implements:
 - **Differentiable Spatial Transformer Networks (STN)**: A self-supervised localization sub-network regressing a 6-parameter affine matrix $\theta \in \mathbb{R}^{2\times 3}$ and performing continuous sub-pixel bilinear sampling $\mathcal{T}_\theta(G)$ to normalize warped signs before classification.
-- **Neuromorphic Event-RGB Cross-Attention (Event-STN)**: Fuses microsecond asynchronous polarity spikes ($1\text{--}10\,\mu\text{s}$) with RGB frames via multi-head cross-attention, restoring crisp spatial boundary edges at $180\,\text{km/h}$ and achieving **$91.5\%$ accuracy ($+52.9\%$ gain over baseline)**.
-- **Certified $L_2$ Adversarial Sphere via Neyman-Pearson Randomized Smoothing**: Provides a provable mathematical guarantee that predictions remain invariant within an $L_2$ perturbation ball of radius $R = 0.38$.
+- **Neuromorphic Event-RGB Cross-Attention (Event-STN)**: mechanism implemented (`event_stream_cross_attention.py`); no event-camera dataset exists in this repository, so NO accuracy or robustness claim is made for the fusion - every number below is from the two frame-based models.
+- **Certified $L_2$ Adversarial Sphere via Randomized Smoothing**: Cohen-style certification measured on the trained baseline model with real smoothing samples.
+
+All numbers in this README were produced by executed runs of
+`gtsrb_reproducible.py` (training) and the two benchmark scripts in
+`implementations/` (evaluation). Configuration: seed 42, 40 epochs,
+batch 256, validation-based checkpoint selection, single final test
+evaluation. An earlier revision of this README carried numbers (99.33%
+clean accuracy, an Event-STN blur table, R = 0.38) that no executed run in
+this repository produced; they have been removed.
 
 ---
 
-## 2. Quantitative Experimental Benchmarks
+## 2. Quantitative Experimental Benchmarks (measured 2026-10-12)
 
-### 2.1 Highway Speed Motion Blur Sweep (30 to 180 km/h)
+### 2.1 Motion blur sweep (synthetic exposure smear on the real GTSRB test set)
 
-| Model Architecture | 30 km/h | 60 km/h | 90 km/h | 120 km/h | 150 km/h | 180 km/h | Accuracy Retention |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Standard CNN Baseline** | 97.8% | 92.4% | 84.1% | 71.3% | 54.2% | 38.6% | Severe Breakdown |
-| **Spatial Transformer (STN)** | 99.3% | 98.1% | 95.8% | 91.2% | 86.4% | 81.5% | Robust |
-| **Event-STN Fusion (Ours)** | **99.4%** | **98.9%** | **97.6%** | **95.8%** | **93.7%** | **91.5%** | **+52.9% Gain at 180 km/h** |
+Top-1 accuracy, 12,630 test images, horizontal box blur with kernel length
+scaled by simulated speed:
 
-<p align="center">
-  <img src="figures/fig_stn_rectification_benchmark.png" alt="STN Rectification Benchmark" width="90%" />
-</p>
+| Condition | Baseline CNN | STN CNN |
+| :--- | :---: | :---: |
+| Clean (no blur) | 96.14% | 98.35% |
+| 30 km/h | 95.26% | 98.00% |
+| 60 km/h | 92.38% | 96.07% |
+| 90 km/h | 87.64% | 91.88% |
+| 120 km/h | 81.73% | 85.08% |
+| 150 km/h | 76.27% | 78.12% |
+| 180 km/h | 71.42% | 70.63% |
 
-### 2.2 Neyman-Pearson Certified Robustness Verification
+Honest reading: the STN holds a 2 to 4 pp margin through moderate blur, but
+the two models converge at 180 km/h (the STN loses its clean-accuracy edge
+first). No model retains usable accuracy under extreme smear.
 
-| Metric | Measured Result | Significance |
+### 2.2 Weather and glare corruption (same protocol; rain/snow are stochastic, mean of 3 seeded repeats)
+
+| Condition | Baseline CNN | STN CNN |
+| :--- | :---: | :---: |
+| Fog (grey veil, alpha 0.45) | 82.45% | 87.93% |
+| Rain (40 diagonal streaks) | 36.39% | 45.47% |
+| Snow (speckle + brightness) | 65.32% | 78.09% |
+| Sun glare (saturation patch) | 73.70% | 69.22% |
+
+Honest reading: the STN wins on fog, rain, and snow, but LOSES 4.5 pp to
+the baseline under glare - affine rectification amplifies the saturated
+patch. The corruption transforms are synthetic ImageNet-C-style
+degradations applied to real test images; they bound, but do not equal,
+real-camera performance.
+
+### 2.3 Certified $L_2$ radius (randomized smoothing, measured)
+
+| Metric | Measured Result | Protocol |
 | :--- | :---: | :--- |
-| **Clean GTSRB Test Accuracy** | **99.33%** | Publication-grade baseline performance |
-| **Certified $L_2$ Radius ($R$)** | **$0.38$** | Mathematical proof of perturbation invariance |
-| **Inference Latency (Edge INT8)** | **$3.42\,\text{ms}$ (292 FPS)** | Deterministic sub-5 ms automotive deadline |
-| **Weather Degradation (Fog/Snow)** | **$< 4.2\%$ accuracy drop** | Maintains safety under severe atmospheric corruption |
+| Clean GTSRB Test Accuracy (baseline) | 96.14% | 12,630 images, single final eval |
+| Clean GTSRB Test Accuracy (STN) | 98.35% | 12,630 images, single final eval |
+| Certified $L_2$ Radius (mean) | $0.6385$ | baseline model, $\sigma=0.25$, $N=100$ smoothing samples/image |
+| Certified accuracy at $\sigma$ | 78.5% | 200-image seeded test subset; correct AND positively certified |
 
-<p align="center">
-  <img src="figures/fig_event_rgb_certified_robustness.png" alt="Certified Robustness Verification" width="85%" />
-</p>
+The verifier (`neyman_pearson_robustness_verifier.py`) computes
+Clopper-Pearson lower bounds on $p_A$ before applying the Cohen radius
+formula; no accuracy or radius is hardcoded. This is a light-weight
+certification run, not a production sweep.
+
+### 2.4 Edge latency (TensorRT INT8)
+
+The `implementations/v1_embedded_edge_inference/` pipeline is reference
+code; no inference latency or FPS number in this repository is a
+measurement. The previous "3.42 ms / 292 FPS" and "120 FPS" figures have
+been removed as unmeasured.
 
 ---
 
@@ -74,22 +111,17 @@ Autonomous-Traffic-Sign-Perception/
 │   └── paper/
 │       ├── RESEARCH_PAPER.md                         # Full IEEE T-ITS format research draft
 │       └── Traffic_Perception_STN_Fusion_TITS.tex    # LaTeX manuscript source
-├── figures/                                          # Publication-grade simulation plots
-│   ├── fig_stn_rectification_benchmark.png           # Speed blur & weather corruption benchmark
-│   ├── fig_event_rgb_certified_robustness.png        # Certified L2 radius verification
-│   ├── fig_stn_affine_rectification.png              # Affine grid normalization
-│   └── fig_weather_adversarial_robustness_benchmark.png
 └── implementations/                                  # Three concrete implementation versions
-    ├── v1_embedded_edge_inference/                   # 120 FPS TensorRT INT8 & V4L2 Camera HAL
+    ├── v1_embedded_edge_inference/                   # Reference edge pipeline (no measured claims)
     │   ├── tensorrt_int8_pipeline.py
     │   ├── v4l2_camera_stream_hal.py
     │   └── main_embedded_vision_runner.py
     ├── v2_spatial_transformer_network/               # PyTorch STN Affine Grid Generator
     │   ├── differentiable_stn_layer.py
-    │   └── corrupted_weather_benchmark.py
-    └── v3_event_rgb_certified_fusion/                # Microsecond Event Voxelizer & Neyman-Pearson
+    │   └── corrupted_weather_benchmark.py            # measured corruption benchmark
+    └── v3_event_rgb_certified_fusion/                # Microsecond Event Voxelizer & verifier
         ├── event_stream_cross_attention.py
-        └── neyman_pearson_robustness_verifier.py
+        └── neyman_pearson_robustness_verifier.py     # measured randomized smoothing
 ```
 
 ---
@@ -97,13 +129,14 @@ Autonomous-Traffic-Sign-Perception/
 ## 4. Execution & Reproduction Guide
 
 ```bash
-# 1. Run Tier 1 Embedded Camera Streaming & INT8 Pipeline:
-python -m implementations.v1_embedded_edge_inference.main_embedded_vision_runner
+# 1. Train the baseline and STN models (validation-based selection):
+python gtsrb_reproducible.py --data-dir data --output-dir results --device cpu --epochs 40 --batch-size 128
+python gtsrb_reproducible.py --data-dir data --output-dir results_stn --device cpu --epochs 40 --batch-size 128 --use-stn
 
-# 2. Run Tier 2 Motion Blur & Weather Corruption Benchmark:
+# 2. Run the measured motion blur / weather corruption benchmark:
 python -m implementations.v2_spatial_transformer_network.corrupted_weather_benchmark
 
-# 3. Run Tier 3 Neyman-Pearson Certified Robustness Verifier:
+# 3. Run the measured randomized-smoothing certification:
 python -m implementations.v3_event_rgb_certified_fusion.neyman_pearson_robustness_verifier
 ```
 

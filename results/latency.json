@@ -1,0 +1,13 @@
+{
+  "protocol": "single-image forward pass, batch 1, 32x32 RGB input",
+  "checkpoint": "./results/best_model.pt",
+  "device_measured": "cpu",
+  "tensorrt_int8": "not measured",
+  "blocker": "no CUDA device on this host; TensorRT INT8 engine build and GPU latency measurement are blocked. Reported values are CPU forward-pass timings, not edge-accelerator figures.",
+  "latency": {
+    "mean_ms": 0.94,
+    "p50_ms": 0.848,
+    "p95_ms": 1.312,
+    "n_iterations": 200
+  }
+}

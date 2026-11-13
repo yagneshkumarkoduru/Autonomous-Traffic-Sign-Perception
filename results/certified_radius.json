@@ -1,0 +1,10 @@
+{
+  "protocol": "randomized smoothing, real GTSRB test subset (seeded)",
+  "checkpoint": "results/best_model.pt",
+  "n_images": 200,
+  "n_smoothing_samples_per_image": 100,
+  "sigma": 0.25,
+  "mean_certified_l2_radius": 0.6385,
+  "certified_accuracy_at_sigma": 78.5,
+  "note": "certified accuracy = fraction of images correctly classified AND certified with positive radius under this sigma; not comparable to clean accuracy"
+}

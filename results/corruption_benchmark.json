@@ -1,0 +1,49 @@
+{
+  "protocol": "synthetic corruptions on real GTSRB test set",
+  "conditions": {
+    "clean": {
+      "baseline_cnn": 96.14,
+      "stn": 98.35
+    },
+    "motion_blur_30kmh": {
+      "baseline_cnn": 95.26,
+      "stn": 98.0
+    },
+    "motion_blur_60kmh": {
+      "baseline_cnn": 92.38,
+      "stn": 96.07
+    },
+    "motion_blur_90kmh": {
+      "baseline_cnn": 87.64,
+      "stn": 91.88
+    },
+    "motion_blur_120kmh": {
+      "baseline_cnn": 81.73,
+      "stn": 85.08
+    },
+    "motion_blur_150kmh": {
+      "baseline_cnn": 76.27,
+      "stn": 78.12
+    },
+    "motion_blur_180kmh": {
+      "baseline_cnn": 71.42,
+      "stn": 70.63
+    },
+    "fog": {
+      "baseline_cnn": 82.45,
+      "stn": 87.93
+    },
+    "rain": {
+      "baseline_cnn": 36.39,
+      "stn": 45.47
+    },
+    "snow": {
+      "baseline_cnn": 65.32,
+      "stn": 78.09
+    },
+    "glare": {
+      "baseline_cnn": 73.7,
+      "stn": 69.22
+    }
+  }
+}

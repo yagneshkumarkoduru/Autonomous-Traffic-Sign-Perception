@@ -25,7 +25,9 @@ class AutomotiveCameraStreamHAL:
         Returns: (cropped_roi_patch, timestamp_nanoseconds)
         """
         current_time_ns = time.time_ns()
-        # Simulated automotive sensor crop around detected sign ROI (32x32)
+        # Placeholder stub: returns a synthetic random patch, not a camera
+        # read. No V4L2 device is opened in this repository; replace with a
+        # real buffer dequeue before any capture claim is made.
         roi_patch = np.random.randint(0, 256, (32, 32, 3), dtype=np.uint8)
         self.last_timestamp_ns = current_time_ns
         return roi_patch, current_time_ns

@@ -31,9 +31,12 @@ class EdgeINT8Quantizer:
         return {
             "quantization_format": "INT8_SYMMETRIC",
             "scales": self.calibrated_scales,
-            "latency_edge_ms": 3.42, # Simulated Jetson Orin Nano execution
-            "throughput_fps": 292.4,
-            "memory_footprint_mb": 4.18
+            # Reference code only. No latency, throughput, or memory figure in
+            # this repository is a measurement on target hardware; earlier
+            # simulated values (3.42 ms, 292 FPS) were removed as unmeasured.
+            "latency_edge_ms": None,
+            "throughput_fps": None,
+            "memory_footprint_mb": None
         }
 
     def export_spec(self, output_path: str = "trt_int8_manifest.json"):

@@ -1,4 +1,4 @@
-# Implementation Versions & Architectural Specifications
+﻿# Implementation Versions & Architectural Specifications
 
 **Autonomous-Traffic-Sign-Perception: Multi-Scale Vision & Neuromorphic Fusion**
 
@@ -11,10 +11,10 @@
 | **Directory** | [`implementations/v1_embedded_edge_inference/`](../implementations/v1_embedded_edge_inference/) | [`implementations/v2_spatial_transformer_network/`](../implementations/v2_spatial_transformer_network/) | [`implementations/v3_event_rgb_certified_fusion/`](../implementations/v3_event_rgb_certified_fusion/) |
 | **Target Platform** | Jetson Orin Nano / Cortex-A78 | Automotive GPU / PyTorch | Edge AI Co-Processor / Neuromorphic Sensor |
 | **Implementation Language** | Python / TensorRT INT8 / V4L2 | PyTorch (Differentiable Autograd) | PyTorch / SciPy Statistics |
-| **Inference Rate** | **120+ FPS (3.4 ms latency)** | 85 FPS | 45 FPS |
-| **Clean Accuracy** | 97.4% (INT8 Calibrated) | **99.33% (Clean GTSRB Test)** | **99.42%** |
-| **180 km/h Motion Blur** | 38.6% (Uncompensated) | 81.5% (STN Affine) | **91.5% (+52.9% gain)** |
-| **Adversarial Security** | Empirical clipping | Empirical data augmentation | **Certified $L_2$ Radius ($R = 0.38$)** |
+| **Inference Rate** | not measured (reference code) | not measured on edge hardware (cloud GPU training only) | not measured |
+| **Clean Accuracy** | not measured (INT8 reference code only) | **98.35% (Clean GTSRB Test, measured)** | not evaluated (no event data) |
+| **180 km/h Motion Blur** | not measured | 70.63% (STN, measured) | not evaluated (no event data) |
+| **Adversarial Security** | Empirical clipping | Empirical data augmentation | Certified $L_2$ radius measured on the BASELINE model only: mean $R=0.6385$ ($\sigma=0.25$, $N=100$) |
 | **Sensor Modality** | Standard RGB CMOS (V4L2) | Monocular RGB Camera | Monocular RGB + Neuromorphic Event Camera |
 
 ---
@@ -23,17 +23,17 @@
 
 ```text
 Autonomous-Traffic-Sign-Perception/
-├── implementations/
-│   ├── v1_embedded_edge_inference/
-│   │   ├── tensorrt_int8_pipeline.py            # Symmetric per-channel INT8 calibration
-│   │   ├── v4l2_camera_stream_hal.py            # V4L2 CSI-2 camera driver with microsecond sync
-│   │   └── main_embedded_vision_runner.py       # Deterministic 120 FPS edge inference loop
-│   ├── v2_spatial_transformer_network/
-│   │   ├── differentiable_stn_layer.py          # PyTorch STN localization network & grid sampler
-│   │   └── corrupted_weather_benchmark.py       # Speed blur & weather corruption benchmark
-│   └── v3_event_rgb_certified_fusion/
-│       ├── event_stream_cross_attention.py       # Microsecond spike voxelizer & cross-attention
-│       └── neyman_pearson_robustness_verifier.py# Certified L2 robustness via randomized smoothing
+â”œâ”€â”€ implementations/
+â”‚   â”œâ”€â”€ v1_embedded_edge_inference/
+â”‚   â”‚   â”œâ”€â”€ tensorrt_int8_pipeline.py            # Symmetric per-channel INT8 calibration
+â”‚   â”‚   â”œâ”€â”€ v4l2_camera_stream_hal.py            # V4L2 CSI-2 camera driver with microsecond sync
+â”‚   â”‚   â””â”€â”€ main_embedded_vision_runner.py       # camera ingestion + preprocessing + inference loop (no FPS measured)
+â”‚   â”œâ”€â”€ v2_spatial_transformer_network/
+â”‚   â”‚   â”œâ”€â”€ differentiable_stn_layer.py          # PyTorch STN localization network & grid sampler
+â”‚   â”‚   â””â”€â”€ corrupted_weather_benchmark.py       # Speed blur & weather corruption benchmark
+â”‚   â””â”€â”€ v3_event_rgb_certified_fusion/
+â”‚       â”œâ”€â”€ event_stream_cross_attention.py       # Microsecond spike voxelizer & cross-attention
+â”‚       â””â”€â”€ neyman_pearson_robustness_verifier.py# Certified L2 robustness via randomized smoothing
 ```
 
 ---

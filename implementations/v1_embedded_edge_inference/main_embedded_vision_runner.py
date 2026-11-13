@@ -1,6 +1,6 @@
 """
 Tier 1 Real-Time Vision Runner for Autonomous Traffic Perception.
-Executes 120 FPS synchronous camera ingestion, preprocessing, and inference loop.
+Executes synchronous camera ingestion, preprocessing, and inference loop (no FPS measured on target hardware).
 """
 
 import time
@@ -38,7 +38,7 @@ class EmbeddedVisionSystemRunner:
 
             if frame_idx % 20 == 0:
                 print(f"[Frame {frame_idx:03d}] Latency: {elapsed_ms:.2f} ms | "
-                      f"Class ID: {pred_class} | Confidence: {conf:.3f} | Target 120 FPS Met")
+                      f"Class ID: {pred_class} | Confidence: {conf:.3f}")
 
         avg_latency = np.mean(latencies)
         print(f"\nAverage End-to-End Latency: {avg_latency:.2f} ms (Achieved {1000.0/avg_latency:.1f} FPS)")

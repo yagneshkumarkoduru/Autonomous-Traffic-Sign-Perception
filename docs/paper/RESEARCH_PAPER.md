@@ -8,14 +8,14 @@
 
 ## Abstract
 
-Safety-critical perception stacks in autonomous ground vehicles encounter two major failure modes: catastrophic motion blur and dynamic range saturation during high-speed highway driving ($>120\text{ km/h}$), and vulnerability to imperceptible adversarial perturbations. Standard frame-based CMOS cameras suffer from exposure lag, causing classification accuracy on the German Traffic Sign Recognition Benchmark (GTSRB) to drop from $98.80\%$ to $38.60\%$ at $180\text{ km/h}$.
+Safety-critical perception stacks in autonomous ground vehicles encounter two major failure modes: catastrophic motion blur and dynamic range saturation during high-speed highway driving ($>120\text{ km/h}$), and vulnerability to adversarial perturbations. On the German Traffic Sign Recognition Benchmark (GTSRB), measured exposure-smear corruption degrades both a standard CNN (96.14% to 71.42%) and an STN-equipped CNN (98.35% to 70.63%) between clean conditions and $180\text{ km/h}$.
 
 This paper develops a unified neuromorphic perception architecture:
 1. **Neuromorphic Event-RGB Cross-Attention Fusion (Event-STN)**: Ingests microsecond-resolution ($10\ \mu\text{s}$) asynchronous event voxel streams and fuses them with frame-based RGB queries through cross-attention to preserve sharp sign contours under severe motion blur.
 2. **Differentiable Spatial Transformer Networks (STN)**: Performs end-to-end gradient-guided projective affine rectification, learning canonical orientation transforms.
 3. **Certified $\ell_2$ Adversarial Sphere via Randomized Smoothing**: Derives a mathematically certified robustness radius $R$ via the Neyman-Pearson lemma, guaranteeing that no $\ell_2$-bounded perturbation can manipulate the classified prediction.
 
-Experimental benchmark evaluations show that Event-STN boosts high-speed $180\text{ km/h}$ accuracy from **$38.60\%$ to $91.50\%$** (**$+52.9\%$ gain**), reaches **$99.33\%$ clean GTSRB accuracy**, and achieves a certified $\ell_2$ radius of **$R = 0.38$** at $90.0\%$ classification confidence.
+Measured benchmark evaluations (2026-10-12, all numbers from executed runs in this repository) show that the STN raises clean GTSRB test accuracy from **96.14% to 98.35%** and holds a 2 to 4 pp margin through moderate motion blur, while both models converge (71.4% vs 70.6%) at $180\text{ km/h}$ smear. Randomized smoothing on the baseline model ($\sigma = 0.25$, $N=100$ smoothing samples) yields a mean certified $\ell_2$ radius of **$R = 0.6385$** with 78.5% certified accuracy on a 200-image seeded subset. The Event-STN fusion is implemented as a mechanism but is not evaluated (no event-camera data in this repository); no fusion accuracy claim is made.
 
 ---
 
@@ -60,22 +60,32 @@ Given base classifier $f(x)$, we construct smoothed classifier $g(x) = \arg\max_
 
 ## 4. Benchmark Validation & Comparative Results
 
-Benchmarking across high-speed velocity sweeps ($30\text{--}180\text{ km/h}$) and certified perturbation radii:
+Measured on the GTSRB test set (12,630 images; seed 42; 40 epochs;
+validation-based selection). Motion blur is a synthetic exposure smear
+applied to the real test images; certification uses randomized smoothing
+with $N=100$ samples and Clopper-Pearson lower bounds:
 
-| Architecture | Clean Accuracy | 120 km/h Blur | 180 km/h Blur | Certified $R$ (at 90% Acc) |
+| Architecture | Clean Accuracy | 120 km/h Blur | 180 km/h Blur | Mean Certified $R$ |
 | :--- | :---: | :---: | :---: | :---: |
-| **Standard RGB CNN** | 98.8% | 68.4% | 38.6% | 0.00 (Uncertified) |
-| **RGB + Differentiable STN** | 99.3% | 79.2% | 56.4% | 0.12 |
-| **Event-RGB STN Fusion (Ours)** | **99.6%** | **95.8%** | **91.5%** | **0.38 (Certified)** |
+| **Standard RGB CNN** | 96.14% | 81.73% | 71.42% | 0.6385 ($\sigma=0.25$, $N=100$) |
+| **RGB + Differentiable STN** | 98.35% | 85.08% | 70.63% | not certified (future work) |
 
-<p align="center">
-  <img src="../../fig_event_rgb_certified_robustness.png" alt="Event RGB Certified Robustness" width="85%" />
-</p>
+Corruption accuracy (same protocol; stochastic corruptions are the mean of
+3 seeded repeats): fog 82.45/87.93%, rain 36.39/45.47%, snow
+65.32/78.09%, glare 73.70/69.22% (baseline/STN). The STN is more robust to
+volumetric weather but more fragile to glare.
 
 ### Key Experimental Discoveries:
-1. **$52.9\%$ Accuracy Improvement at 180 km/h**: Overcomes sensor exposure limits by fusing asynchronous neuromorphic edge spikes with RGB texture.
-2. **Mathematically Certified Robustness ($R = 0.38$)**: Proves certified resilience against worst-case $\ell_2$ attacks via Neyman-Pearson randomized smoothing.
-3. **Real-Time Edge Execution**: Sustains $42.1\text{ FPS}$ on embedded GPU platforms.
+1. **STN margin, not STN invincibility**: the STN holds a 2 to 4 pp margin
+   through moderate blur and weather, but the advantage vanishes at
+   $180\text{ km/h}$ smear and reverses under glare.
+2. **Certified robustness is measurable at this scale**: the baseline model
+   certifies 78.5% of a 200-image subset at $\sigma = 0.25$ with mean
+   radius 0.6385; the protocol (seeded subset, $N$, $\sigma$) is reported
+   with the number.
+3. **Not measured**: event-fusion accuracy (no event data), edge latency
+   (no embedded hardware runs), and any production-grade certification
+   sweep. Claims on these topics should not be cited from this draft.
 
 ---
 

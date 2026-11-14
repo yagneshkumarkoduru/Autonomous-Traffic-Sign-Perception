@@ -17,3 +17,5 @@ Notes.ipynb
 __pycache__/
 *.pyc
 .venv/
+
+*.pt

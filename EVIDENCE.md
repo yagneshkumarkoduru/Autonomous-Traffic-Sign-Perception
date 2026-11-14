@@ -101,6 +101,51 @@ and are withdrawn. They must not be cited.
 | Certified radius R = 0.38 | Withdrawn | Produced by an unvalidated script path. Current measured value: R = 0.6385. |
 | 3.42 ms edge latency | Withdrawn | No CUDA/TensorRT measurement was ever executed on this host. Current measured value: 0.94 ms mean CPU forward pass. |
 
+## Motion-Blur Speed Ladder, Blur-Trained Models (SIMULATION on real images)
+
+Run on 2026-11-14 on one NVIDIA A10G (AWS g5.2xlarge spot, us-east-1,
+PyTorch 2.8.0+cu129). Three models trained with identical budgets
+(`epochs=40`, `batch_size=256`, `lr=1e-3`, `seed=42`,
+`val_fraction=0.1`) under `implementations/v3_event_rgb_certified_fusion/
+train_event_stn.py`:
+
+- baseline: TrafficSignNet(use_stn=False), flat motion-blur augmentation
+- stn: TrafficSignNet(use_stn=True), flat motion-blur augmentation
+- event_stn: EventSTNNet, blur curriculum (clean first, then progressively
+  higher-speed smear mixed in)
+
+Motion-blur corruption at train and test time is the same horizontal
+exposure-smear kernel (kernel length = round(speed/15), odd). Validation used
+the full 0-180 km/h ladder for checkpoint selection; the single final
+evaluation ran once on the held-out 12,630-image GTSRB test set with the best
+validation checkpoint. Sources: `results/baseline_blur/results.json`,
+`results/stn/results.json`, `results/event_stn/results.json`,
+`results/event_stn_training_summary.json`.
+
+| Speed | Baseline CNN | STN CNN | Event-STN | Tag |
+|---|---|---|---|---|
+| 0 km/h (clean) | 96.60% | 97.84% | 96.62% | SIMULATION |
+| 30 km/h | 96.69% | 97.86% | 96.64% | SIMULATION |
+| 60 km/h | 96.45% | 97.73% | 96.51% | SIMULATION |
+| 90 km/h | 95.73% | 97.37% | 96.16% | SIMULATION |
+| 120 km/h | 95.38% | 96.86% | 95.49% | SIMULATION |
+| 150 km/h | 94.54% | 96.22% | 94.58% | SIMULATION |
+| 180 km/h | 93.42% | 95.23% | 93.37% | SIMULATION |
+
+Finding: under this matched-budget blur-training protocol, Event-STN does not
+beat the baseline CNN at high speed (93.37% vs 93.42% at 180 km/h) and does
+not beat the STN CNN at any speed. The STN CNN is the strongest model across
+the entire ladder. The event channel in EventSTNNet is a synthetic proxy
+(frame-difference), not real event-camera data; the cross-attention adds
+capacity that the 32x32 GTSRB task does not reward. This negative result is
+recorded as measured.
+
+Best validation checkpoints: baseline epoch 38, stn epoch 33, event_stn epoch
+40 (val ladder means 99.94%, 99.97%, 99.83% respectively).
+
+Run cost: g5.2xlarge spot for approximately 2.8 hours, approximately $2.10.
+Budget approved for this run: $75.
+
 ## Model Properties (MODEL)
 
 - STN localization network: two conv layers (7x7 then 5x5) feeding a 6-parameter

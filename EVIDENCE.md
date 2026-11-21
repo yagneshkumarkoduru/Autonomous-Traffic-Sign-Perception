@@ -45,6 +45,39 @@ of the same checkpoint.
 | 150 km/h | 76.27% | 78.12% | SIMULATION |
 | 180 km/h | 71.42% | 70.63% | SIMULATION |
 
+## Blur-Augmented Speed Sweep (three-way matched-budget retrain, SIMULATION on real images)
+
+Three models trained with identical budgets (40 epochs, batch 256, Adam lr 1e-3,
+seed 42, stratified 90/10 split, validation-based checkpoint selection, single
+final evaluation on the held-out 12,630-image GTSRB test set) on a Tesla T4
+(g4dn.2xlarge, PyTorch 2.8.0+cu129). The baseline and STN runs use a fixed
+flat-ish motion-blur sampling distribution; the Event-STN run uses the blur
+curriculum (clean first, then progressively higher-speed smear). Train and
+test see the same physical corruption family (horizontal exposure-smear,
+kernel length = round(speed/15), odd). Sources:
+`results_baseline_blur/results.json`, `results_stn/results.json`,
+`results_event_stn/results.json`, summary
+`results/event_stn_training_summary.json`. Checkpoints archived in S3 under
+`s3://esthien-atlas-eda-969739653654/engineering/traffic-sign/`.
+
+| Speed | Baseline CNN (blur-aug) | STN CNN (blur-aug) | Event-STN (curriculum) | Tag |
+|---|---|---|---|---|
+| 0 km/h (clean) | 95.57% | 97.65% | 97.16% | SIMULATION |
+| 30 km/h | 95.76% | 97.57% | 97.19% | SIMULATION |
+| 60 km/h | 95.71% | 97.27% | 96.99% | SIMULATION |
+| 90 km/h | 95.17% | 97.02% | 96.44% | SIMULATION |
+| 120 km/h | 94.51% | 96.57% | 95.73% | SIMULATION |
+| 150 km/h | 93.44% | 95.73% | 94.82% | SIMULATION |
+| 180 km/h | 92.16% | 94.47% | 93.32% | SIMULATION |
+
+Findings: blur-augmented training lifts every model far above the
+unaugmented sweep above (baseline 92.16% vs 71.42% at 180 km/h). The STN
+leads at every speed. The Event-STN beats the matched baseline at every
+speed but does not beat the STN at any speed; its event channel is
+synthesized from the smeared frame itself (see `event_stn_fusion.py`), so
+its advantage over the STN under synthetic blur is null. Best epochs:
+baseline 28, STN 30, Event-STN 35.
+
 ## Weather Corruptions (SIMULATION on real images)
 
 Synthetic fog, rain, snow, and glare applied to the real GTSRB test set.
